@@ -22,7 +22,7 @@ $(document).ready(function(){
         */
 
 		var puzz = {}; // put data array in object literal to namespace it into safety
-		puzz.data = entryData;
+		puzz = entryData;
 
 		// append clues markup after puzzle wrapper div
 		// This should be moved into a configuration object
@@ -34,7 +34,7 @@ $(document).ready(function(){
 			clues = $('#puzzle-clues'),
 			clueLiEls,
 			coords,
-			entryCount = puzz.data.length,
+			entryCount = puzz.puzzleData.length,
 			entries = [],
 			rows = [],
 			cols = [],
@@ -55,7 +55,7 @@ $(document).ready(function(){
 				currOri = 'across'; // app's init orientation could move to config object
 
 				// Reorder the problems array ascending by POSITION
-				puzz.data.sort(function(a,b) {
+				puzz.puzzleData.sort(function(a,b) {
 					return a.position - b.position;
 				});
 
@@ -184,14 +184,14 @@ $(document).ready(function(){
 					entries.push(i);
 					entries[i] = [];
 
-					for (var x=0, j = puzz.data[i].answer.length; x < j; ++x) {
+					for (var x=0, j = puzz.puzzleData[i].answer.length; x < j; ++x) {
 						entries[i].push(x);
-						coords = puzz.data[i].orientation === 'across' ? "" + puzz.data[i].startx++ + "," + puzz.data[i].starty + "" : "" + puzz.data[i].startx + "," + puzz.data[i].starty++ + "" ;
+						coords = puzz.puzzleData[i].orientation === 'across' ? "" + puzz.puzzleData[i].startx++ + "," + puzz.puzzleData[i].starty + "" : "" + puzz.puzzleData[i].startx + "," + puzz.puzzleData[i].starty++ + "" ;
 						entries[i][x] = coords;
 					}
 
 					// while we're in here, add clues to DOM!
-					$('#' + puzz.data[i].orientation).append('<li value="' + puzz.data[i].position + '" tabindex="1" data-position="' + i + '">' + puzz.data[i].clue + '</li>');
+					$('#' + puzz.puzzleData[i].orientation).append('<li value="' + puzz.puzzleData[i].position + '" tabindex="1" data-position="' + i + '">' + puzz.puzzleData[i].clue + '</li>');
 				}
 
 				// Calculate rows/cols by finding max coords of each entry, then picking the highest
@@ -234,10 +234,10 @@ $(document).ready(function(){
 					light,
 					$groupedLights,
 					hasOffset = false,
-					positionOffset = entryCount - puzz.data[puzz.data.length-1].position; // diff. between total ENTRIES and highest POSITIONS
+					positionOffset = entryCount - puzz.puzzleData[puzz.puzzleData.length-1].position; // diff. between total ENTRIES and highest POSITIONS
 
 				for (var x=0, p = entryCount - 1; x <= p; x++) {
-					var letters = puzz.data[x].answer.split('');
+					var letters = puzz.puzzleData[x].answer.split('');
 
 					for (var i=0; i < entries[x].length; ++i) {
 						light = $('#puzzle td[data-coords="' + entries[x][i] + '"]');
@@ -246,7 +246,7 @@ $(document).ready(function(){
 						// If so, it means there's an across & down entry for the position.
 						// Therefore you need to subtract the offset when applying the entry class.
 						if(x > 1 ){
-							if (puzz.data[x].position === puzz.data[x-1].position) {
+							if (puzz.puzzleData[x].position === puzz.puzzleData[x-1].position) {
 								hasOffset = true;
 							};
 						}
@@ -261,12 +261,12 @@ $(document).ready(function(){
 				};
 
 				// Put entry number in first 'light' of each entry, skipping it if already present
-				for (var i=1, p = entryCount; i < p; i++) {
+				for (var i=0, p = entryCount; i < p; i++) {
 					$groupedLights = $('.entry-' + i);
 
 					if(!$('.entry-' + i +':eq(0) span').length){
 						$groupedLights.eq(0)
-							.append('<span>' + puzz.data[i].position + '</span>');
+							.append('<span>' + puzz.puzzleData[i].position + '</span>');
 					}
 				}
 
@@ -303,7 +303,7 @@ $(document).ready(function(){
 
 				util.getActivePositionFromClassGroup($(e.target));
 
-			// 	valToCheck = puzz.data[activePosition].answer.toLowerCase();
+			// 	valToCheck = puzz.puzzleData[activePosition].answer.toLowerCase();
 			//
 			// 	currVal = $('.position-' + activePosition + ' input')
 			// 		.map(function() {
@@ -565,23 +565,25 @@ $(document).ready(function(){
 		puzInit.init();
 
 		restoreCrossword();
+		showButtons();
 
-		$("#solution").click(showSolution);
-
+		$("#showSolution").click(showSolution);
 		$("#save").click(save);
+		$("#check").click(checkAnswer);
+		$("[type='submit']").click(submit);
 
 		function showSolution(){
 
-			for(let i = 0; i<puzz.data.length; i++){
+			for(let i = 0; i<puzz.puzzleData.length; i++){
 				// console.log($("td").hasClass('position-' + i));
 
-				let word = puzz.data[i].answer;
+				let word = puzz.puzzleData[i].answer;
 				let firstCoord = $(".position-" + i).attr('data-coords');
 
 				for(let j = 0; j < word.length; j++){
 					let newCoord;
 
-					if (puzz.data[i].orientation === 'across'){
+					if (puzz.puzzleData[i].orientation === 'across'){
 						let xCoord = parseInt(firstCoord.substr(0, firstCoord.indexOf(','))) + j;
 						newCoord = xCoord + firstCoord.substr(firstCoord.indexOf(','));
 					}
@@ -605,12 +607,13 @@ $(document).ready(function(){
 					crossword[i][j] = $("[data-coords='" + coord + "'] input").val();
 				}
 			}
-			localStorage.setItem("crossword", JSON.stringify(crossword));
+
+			localStorage.setItem(puzz.magazineNr + '-' + puzz.crosswordNr, JSON.stringify(crossword));
 		}
 		
 		function restoreCrossword() {
-			if (localStorage.getItem("crossword") !== null) {
-				let crossword = JSON.parse(localStorage.getItem("crossword"));;
+			if (localStorage.getItem(puzz.magazineNr + '-' + puzz.crosswordNr) !== null) {
+				let crossword = JSON.parse(localStorage.getItem(puzz.magazineNr + '-' + puzz.crosswordNr));
 
 				for(let i = 1; i < $("tr").length + 1; i++){
 					for(let j = 1; j < $("tr:first td").length + 1; j++){
@@ -620,5 +623,87 @@ $(document).ready(function(){
 				}
 			}
 		}
+
+		function checkAnswer() {
+			for(let i = 0; i<puzz.puzzleData.length; i++){
+
+				valToCheck = puzz.puzzleData[i].answer.toLowerCase();
+
+				currVal = $('.position-' + i + ' input')
+					.map(function() {
+						return $(this)
+							.val()
+							.toLowerCase();
+					})
+					.get()
+					.join('');
+
+				//console.log(currVal + " " + valToCheck);
+				if(valToCheck !== currVal){
+					alert("puzzle not solved");
+					return;
+				}
+			}
+
+			alert("you solved the puzzle");
+		}
+
+		function submit(e) {
+		    e.preventDefault();
+
+			let crossword = [];
+
+			for(let i = 1; i < $("tr").length + 1; i++){
+				crossword[i] = [];
+				for(let j = 1; j < $("tr:first td").length + 1; j++){
+					let coord = i + ',' + j;
+					crossword[i][j] = $("[data-coords='" + coord + "'] input").val();
+				}
+			}
+
+			$.ajax({
+                type: 'POST',
+                url: '/processForm.php',
+                data: {
+                    alumniNr: $("#alumniNr").val(),
+                    name: $("#name").val(),
+                    email: $("#email").val(),
+                    college: $("#college").val(),
+                    yearOfMatric: $("#yearOfMatric").val(),
+                    notes: $("#notes").val(),
+                    crossword: JSON.stringify(crossword)
+                },
+                cache: false,
+                success: function (data, status) {
+                    console.log(data);
+                }
+			});
+		}
+
+		function showButtons() {
+            $("body").append("<button id='save'>Save</button>");
+
+            if (puzz.current){
+                $("body").append('<form method="post" >\n' +
+                    '\t<label for="alumniNr">Alumni number:</label>\n' +
+                    '\t<input name="alumniNr" id="alumniNr" type="number">\n' +
+                    '\t<label for="name">Name:</label>\n' +
+                    '\t<input name="name" id="name" type="text" required>\n' +
+                    '\t<label for="email">Email:</label>\n' +
+                    '\t<input name="email" id="email" type="email" required>\n' +
+                    '\t<label for="college">College:</label>\n' +
+                    '\t<input name="college" id="college" type="text" required>\n' +
+                    '\t<label for="yearOfMatric">Year of matriculation: *</label>\n' +
+                    '\t<input name="yearOfMatric" id="yearOfMatric" type="number">\n' +
+                    '\t<label for="notes">Solution notes/comments:</label>\n' +
+                    '\t<textarea name="notes" id="notes"></textarea>\n' +
+                    '\n' +
+                    '\t<button type="submit" disabled>Submit</button>\n' +
+                    '</form>')
+            } else {
+                $("body").append('<button id="showSolution">Show solution</button>\n' +
+                    '<button id="check">Check answer</button>');
+            }
+        }
 	}
 });
