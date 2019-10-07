@@ -600,15 +600,21 @@ $(document).ready(function(){
 		function save() {
 			let crossword = [];
 
-			for(let i = 1; i < $("tr").length + 1; i++){
-				crossword[i] = [];
-				for(let j = 1; j < $("tr:first td").length + 1; j++){
-					let coord = i + ',' + j;
-					crossword[i][j] = $("[data-coords='" + coord + "'] input").val();
+			try {
+				for(let i = 1; i < $("tr").length + 1; i++){
+					crossword[i] = [];
+					for(let j = 1; j < $("tr:first td").length + 1; j++){
+						let coord = i + ',' + j;
+						crossword[i][j] = $("[data-coords='" + coord + "'] input").val();
+					}
 				}
-			}
 
-			localStorage.setItem(puzz.magazineNr + '-' + puzz.crosswordNr, JSON.stringify(crossword));
+				localStorage.setItem(puzz.magazineNr + '-' + puzz.crosswordNr, JSON.stringify(crossword));
+
+				alert("Saved")
+			} catch (e) {
+				alert("Something went wrong")
+			}
 		}
 		
 		function restoreCrossword() {

@@ -638,7 +638,7 @@
 
 		};
 
-		$('#puzzle-wrapper').crossword(oldPuzzle);
+		$('#puzzle-wrapper').crossword(newPuzzle);
 
 	})
 
