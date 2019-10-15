@@ -3,7 +3,7 @@ $(document).ready(function () {
 
 	//AJAX call to get puzzle in JSON
 	$.ajax({
-		url: "/assets/json/oldPuzzle.json",
+		url: "/assets/json/newPuzzle.json",
 		async: false,
 		dataType: 'json',
 		success: function(data) {
@@ -153,7 +153,7 @@ $(document).ready(function () {
 			},
 			cache: false,
 			success: function (data, status) {
-				console.log(data);
+				alert("You have sent the answer.")
 			}
 		});
 	}

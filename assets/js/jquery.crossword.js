@@ -90,6 +90,9 @@
 
 
 						if (e.keyCode === 8 || e.keyCode === 46) {
+							//Check if everything is filled in and disable/enable submit button
+							checkFilledIn();
+
 							currOri === 'across' ? nav.nextPrevNav(e, 37) : nav.nextPrevNav(e, 38);
 						} else {
 							nav.nextPrevNav(e);
@@ -285,23 +288,8 @@
 			//Changed the name from checkAnswer to moveToNext
 			//Only check answer if it's an old puzzle with a button
 			moveToNext: function (e) {
-				let complete;
-
-				//Check if everything is filled in
-				for (let i = 1; i < $("tr").length + 1; i++) {
-					for (let j = 1; j < $("tr:first td").length + 1; j++) {
-						let coord = i + ',' + j;
-						if ($("[data-coords='" + coord + "'] input").val() === '') {
-							complete = false;
-							break
-						} else
-							complete = true
-					}
-				}
-
-				//If all boxes are filled in, enable submit button
-				if (complete === true)
-					$("[type='submit']").removeAttr("disabled");
+				//Check if everything is filled in and disable/enable submit button
+				checkFilledIn();
 
 				// var valToCheck, currVal;
 
@@ -338,7 +326,6 @@
 				//console.log('checkAnswer() solvedToggle: '+solvedToggle);
 
 			}
-
 
 		}; // end puzInit object
 
@@ -568,5 +555,27 @@
 
 
 		puzInit.init();
+	};
+
+	//Check if everything is filled in and disable/enable submit button
+	function checkFilledIn() {
+		var complete;
+
+		//Check if everything is filled in
+		for (let i = 1; i < $("tr").length + 1; i++) {
+			for (let j = 1; j < $("tr:first td").length + 1; j++) {
+				let coord = i + ',' + j;
+
+				if(complete !== false)
+					complete = $("[data-coords='" + coord + "'] input").val() !== '';
+			}
+		}
+
+		//If all boxes are filled in, enable submit button
+		if (complete === true){
+			$("[type='submit']").removeAttr("disabled");
+		} else {
+			$("[type='submit']").attr("disabled", true);
+		}
 	}
 })(jQuery);
