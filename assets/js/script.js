@@ -3,7 +3,7 @@ $(document).ready(function () {
 
 	//AJAX call to get puzzle in JSON
 	$.ajax({
-		url: "/assets/json/newPuzzle.json",
+		url: "/assets/json/oldPuzzle.json",
 		async: false,
 		dataType: 'json',
 		success: function(data) {

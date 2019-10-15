@@ -7,6 +7,7 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
     max-width: 100%;
+    border: solid;
 }
 table tr{
     width: 100%;
@@ -56,6 +57,22 @@ input.done {
 .clue-done {
     color: #999;
     text-decoration: line-through;
+}
+
+.across-begin{
+    border-left: 3px solid black;
+}
+
+.down-begin{
+    border-top: 3px solid black;
+}
+
+.across-end{
+    border-right: 3px solid black;
+}
+
+.down-end{
+    border-bottom: 3px solid black;
 }
 
 #puzzle-wrapper {

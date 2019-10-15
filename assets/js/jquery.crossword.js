@@ -259,6 +259,18 @@
 								.addClass('entry-' + (x) + ' position-' + (x))
 								.append('<input maxlength="1" val="" type="text" tabindex="-1" />');
 						}
+
+						if (i === 0 && puzz.puzzleData[x].orientation === 'across'){
+							$(light).addClass('across-begin');
+						} else if(i === 0 && puzz.puzzleData[x].orientation === 'down') {
+							$(light).addClass('down-begin');
+						}
+
+						if (i === entries[x].length - 1 && puzz.puzzleData[x].orientation === 'across'){
+							$(light).addClass('across-end');
+						} else if(i === entries[x].length - 1 && puzz.puzzleData[x].orientation === 'down') {
+							$(light).addClass('down-end');
+						}
 					};
 
 				};
