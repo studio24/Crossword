@@ -260,6 +260,8 @@
 								.append('<input maxlength="1" val="" type="text" tabindex="-1" />');
 						}
 
+						//Add class at the begin and end of word for CSS
+						//CSS make it more easier to separate the words
 						if (i === 0 && puzz.puzzleData[x].orientation === 'across'){
 							$(light).addClass('across-begin');
 						} else if(i === 0 && puzz.puzzleData[x].orientation === 'down') {
